@@ -26,7 +26,6 @@ public class Employee {
 
     private List<Person> personList;
 
-
     public static Employee of(int id, String name, String surname, String taxpayerIdentificationNumber, List<Person> personList) {
         Employee employee = new Employee();
         employee.id = id;

@@ -40,12 +40,7 @@ public class EmployeeController {
 
     @GetMapping("{id}")
     public Employee findById(@PathVariable("id") int id) {
-        Person remote = rest.getForObject(API_ID, Person.class, id);
-        List<Person> persons = rest.exchange(
-                API,
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() { }
-        ).getBody();
-        return Employee.of(remote.getId(), remote.getLogin(), remote.getLogin(), remote.getPassword(), persons);
+        return rest.getForObject(API_ID, Employee.class, id);
     }
 
     @PostMapping("/")
