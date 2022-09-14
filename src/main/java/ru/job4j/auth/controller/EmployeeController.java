@@ -9,8 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.job4j.auth.dto.Employee;
 import ru.job4j.auth.model.Person;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/employee")
@@ -19,6 +18,8 @@ public class EmployeeController {
     private final RestTemplate rest;
     private static final String API = "http://localhost:8189/person/";
     private static final String API_ID = "http://localhost:8189/person/{id}";
+    private final Map<Integer, Employee> storeEmployee = new HashMap<>();
+    private static int count = 1;
 
     public EmployeeController(RestTemplate rest) {
         this.rest = rest;
@@ -34,18 +35,24 @@ public class EmployeeController {
         persons.forEach(elem -> {
             Employee emp = Employee.of(elem.getId(), elem.getLogin(), elem.getLogin(), elem.getPassword(), persons);
             rsl.add(emp);
+            storeEmployee.put(count++, emp);
         });
         return rsl;
     }
 
     @GetMapping("{id}")
-    public Employee findById(@PathVariable("id") int id) {
-        return rest.getForObject(API_ID, Employee.class, id);
+    public ResponseEntity<Employee> findById(@PathVariable("id") int id) {
+        Optional<Employee> rsl = Optional.of(this.storeEmployee.get(id));
+        return new ResponseEntity<>(
+                rsl.orElse(new Employee()),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/")
     public ResponseEntity<Employee> create(@RequestBody Person person) {
         Employee rsl = rest.postForObject(API, person, Employee.class);
+        storeEmployee.put(count++, rsl);
         return new ResponseEntity<>(
                 rsl,
                 HttpStatus.CREATED
